@@ -45,7 +45,7 @@ export default class MainComponent extends Component {
               className="new-todo"
               placeholder="What needs to be done ?"
               onKeyDown={::this._onKeyDown}
-              autofocus />
+              autoFocus />
           </header>
           <section
             style={{display: filteredTodos.count() > 0 ? 'block' : 'none'}}

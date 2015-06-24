@@ -1,6 +1,6 @@
 # TodoMVC React RxJS
 
-[**Demo**](http://unknown-substance.surge.sh/)
+[**Demo**](https://unknown-substance.surge.sh/#/)
 
 This is an implementation of [TodoMVC](http://todomvc.com/), using [React](http://facebook.github.io/react/) for managing the DOM, and [RxJS](https://github.com/Reactive-Extensions/RxJS) for statelessly managing data.
 

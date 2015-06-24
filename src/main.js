@@ -2,14 +2,24 @@ import 'todomvc-app-css/index.css';
 import 'todomvc-common/base.css';
 
 import models from './models';
-import { insertTodo } from './intents';
+import { insertTodo, markAll, clearCompleted } from './intents';
 import React from 'react';
+import classnames from 'classnames';
+import TodoItem from './components/TodoItem';
 
 function onKeyDown(event) {
   if (event.keyCode === 13) {
     insertTodo(event.target.value);
     event.target.value = '';
   }
+}
+
+function onMarkAllChange() {
+  markAll();
+}
+
+function onClearCompletedClick() {
+  clearCompleted();
 }
 
 models.subscribe(state => {
@@ -24,36 +34,44 @@ models.subscribe(state => {
             onKeyDown={onKeyDown}
             autofocus />
         </header>
-        <section>
-          <ul>
+        <section
+          style={{display: state.count() > 0 ? 'block' : 'none'}}
+          className='main'>
+          <input
+            checked={state.every(todo => todo.get('done'))}
+            onChange={onMarkAllChange}
+            className='toggle-all'
+            type='checkbox' />
+          <label htmlFor='toggle-all'>
+            Mark all as complete
+          </label>
+          <ul className={classnames('todo-list')}>
             {state.map(todo =>
-              <li key={todo.get('id')} className={todo.get('done')}>
-                <div className='view'>
-                  <input className='toggle' type='checkbox' checked={todo.checked} />
-                  <label>{todo.get('text')}</label>
-                  <button className='destroy'></button>
-                </div>
-              </li>
-            ).toJSON()}
+              <TodoItem key={todo.get('id')} todo={todo} />
+            )}
           </ul>
         </section>
+        <footer
+          style={{display: state.count() > 0 ? 'block' : 'none'}}
+          className='footer'>
+          <span className="todo-count"></span>
+          <ul className='filters'>
+            <li>
+              <a href='#/' className='selected'>All</a>
+            </li>
+            <li>
+              <a href='#/active'>Active</a>
+            </li>
+            <li>
+              <a href='#/completed'>Completed</a>
+            </li>
+          </ul>
+          <button
+            onClick={onClearCompletedClick}
+            className='clear-completed'>Clear Completed</button>
+        </footer>
       </section>
-      <footer>
-        <span id="todo-count"></span>
-        <ul>
-          <li>
-            <a href='#/' className='selected'>All</a>
-          </li>
-          <li>
-            <a href='#/active'>Active</a>
-          </li>
-          <li>
-            <a href='#/completed'>Completed</a>
-          </li>
-        </ul>
-        <button>Clear Completed</button>
-      </footer>
-      <footer>
+      <footer className='info'>
         <p>Double-click to edit a todo</p>
         <p>
           Created by {' '}

@@ -4,7 +4,8 @@ import {
   MARK_TODO,
   MARK_ALL,
   REMOVE_TODO,
-  CLEAR_COMPLETED
+  CLEAR_COMPLETED,
+  EDIT_TODO
 } from '../constants';
 
 export const intent = new ReplaySubject(1);
@@ -38,4 +39,13 @@ export function markAll() {
 
 export function clearCompleted() {
   intent.onNext({ type: CLEAR_COMPLETED });
+}
+
+export function editTodo(todoId, text) {
+  intent.onNext({
+    todoId,
+    text,
+
+    type: EDIT_TODO
+  });
 }

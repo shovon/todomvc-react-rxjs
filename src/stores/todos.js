@@ -5,7 +5,8 @@ import {
   MARK_TODO,
   MARK_ALL,
   REMOVE_TODO,
-  CLEAR_COMPLETED
+  CLEAR_COMPLETED,
+  EDIT_TODO
 } from '../constants';
 import { List, Map as ImmutableMap } from 'immutable';
 
@@ -23,7 +24,6 @@ const callbacks = {
     });
     state = state.push(todo);
     return state;
-    // model.onNext(state);
   },
 
   [MARK_TODO]: payload => {
@@ -32,13 +32,11 @@ const callbacks = {
     const todo = state.get(todoIndex);
     state = state.set(todoIndex, todo.set('done', payload.isCompleted));
     return state;
-    // model.onNext(state);
   },
 
   [REMOVE_TODO]: payload => {
     state = state.filter(todo => todo.get('id') !== payload.todoId);
     return state;
-    // model.onNext(state);
   },
 
   [MARK_ALL]: () => {
@@ -48,13 +46,19 @@ const callbacks = {
       state = state.map(todo => todo.set('done', true));
     }
     return state;
-    // model.onNext(state);
   },
 
   [CLEAR_COMPLETED]: () => {
     state = state.filter(todo => !todo.get('done'));
     return state;
-    // model.onNext(state);
+  },
+
+  [EDIT_TODO]: payload => {
+    const todoIndex = state
+      .findIndex(todo => todo.get('id') === payload.todoId);
+    const todo = state.get(todoIndex);
+    state = state.set(todoIndex, todo.set('text', payload.text));
+    return state;
   }
 };
 

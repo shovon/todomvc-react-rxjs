@@ -5,12 +5,14 @@ import {
   MARK_ALL,
   REMOVE_TODO,
   CLEAR_COMPLETED,
-  EDIT_TODO
+  EDIT_TODO,
+  LOAD_TODOS
 } from '../constants';
 
 export const intent = new ReplaySubject(1);
 
 export function insertTodo(text) {
+
   intent.onNext({
     type: INSERT_TODO,
     text: text
@@ -47,5 +49,11 @@ export function editTodo(todoId, text) {
     text,
 
     type: EDIT_TODO
+  });
+}
+
+export function loadTodos() {
+  intent.onNext({
+    type: LOAD_TODOS
   });
 }

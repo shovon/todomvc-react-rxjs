@@ -4,6 +4,7 @@ import 'todomvc-common/base.css';
 import React from 'react';
 import MainComponent from './components/MainComponent';
 import Router, { Route } from 'react-router';
+import { loadTodos } from './actions/todoActions';
 
 Router.run(
   <Route path='*' handler={MainComponent} ignoreScrollBehavior></Route>,
@@ -15,3 +16,5 @@ Router.run(
     );
   }
 );
+
+loadTodos();

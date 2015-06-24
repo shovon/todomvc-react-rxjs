@@ -29,6 +29,9 @@ export default class MainComponent extends Component {
   }
 
   render() {
+    if (this.state === null) {
+      return <div></div>;
+    }
     const { todos } = this.state;
     const filteredTodos = this._filterTodosGivenPath();
     const activeClassName = 'selected';

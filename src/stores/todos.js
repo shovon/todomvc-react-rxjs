@@ -6,66 +6,68 @@ import {
   MARK_ALL,
   REMOVE_TODO,
   CLEAR_COMPLETED,
-  EDIT_TODO
+  EDIT_TODO,
+  LOAD_TODOS
 } from '../constants';
-import { List, Map as ImmutableMap } from 'immutable';
+import { fromJS, List, Map as ImmutableMap } from 'immutable';
+
+const localStorageKey = 'todomvc-react-rjxs';
 
 const model = new ReplaySubject(1);
 
-let state = new List();
-
 const callbacks = {
-  [INSERT_TODO]: payload => {
+  [INSERT_TODO]: (state, payload) => {
     const latest = state.get(state.count() - 1);
     const todo = new ImmutableMap({
       id: typeof latest === 'undefined' ? 0 : latest.get('id') + 1,
       text: payload.text,
       done: false
     });
-    state = state.push(todo);
-    return state;
+    return state.push(todo);
   },
 
-  [MARK_TODO]: payload => {
+  [MARK_TODO]: (state, payload) => {
     const todoIndex = state
       .findIndex(todo => todo.get('id') === payload.todoId);
     const todo = state.get(todoIndex);
-    state = state.set(todoIndex, todo.set('done', payload.isCompleted));
-    return state;
+    return state.set(todoIndex, todo.set('done', payload.isCompleted));
   },
 
-  [REMOVE_TODO]: payload => {
-    state = state.filter(todo => todo.get('id') !== payload.todoId);
-    return state;
+  [REMOVE_TODO]: (state, payload) => {
+    return state.filter(todo => todo.get('id') !== payload.todoId);
   },
 
-  [MARK_ALL]: () => {
+  [MARK_ALL]: state => {
     if (state.every(todo => todo.get('done'))) {
-      state = state.map(todo => todo.set('done', false));
-    } else {
-      state = state.map(todo => todo.set('done', true));
+      return state.map(todo => todo.set('done', false));
     }
-    return state;
+    return state.map(todo => todo.set('done', true));
   },
 
-  [CLEAR_COMPLETED]: () => {
-    state = state.filter(todo => !todo.get('done'));
-    return state;
+  [CLEAR_COMPLETED]: state => {
+    return state.filter(todo => !todo.get('done'));
   },
 
-  [EDIT_TODO]: payload => {
+  [EDIT_TODO]: (state, payload) => {
     const todoIndex = state
       .findIndex(todo => todo.get('id') === payload.todoId);
     const todo = state.get(todoIndex);
-    state = state.set(todoIndex, todo.set('text', payload.text));
-    return state;
+    return state.set(todoIndex, todo.set('text', payload.text));
+  },
+
+  [LOAD_TODOS]: () => {
+    return fromJS(JSON.parse(localStorage.getItem(localStorageKey)));
   }
 };
 
-intent.subscribe(payload => {
-  model.onNext(callbacks[payload.type](payload));
-});
-
-model.onNext(state);
+// `reduce` used as a hack for maintaining state. Will do for now.
+intent.reduce((state, payload) => {
+  const result = callbacks[payload.type](state, payload);
+  if (payload.type !== LOAD_TODOS) {
+    localStorage.setItem(localStorageKey, JSON.stringify(result.toJSON()));
+  }
+  model.onNext(result);
+  return result;
+}, new List()).subscribe();
 
 export default model;

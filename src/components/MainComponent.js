@@ -1,4 +1,4 @@
-import models from '../models';
+import { todos as todosModel } from '../models';
 import classnames from 'classnames';
 import { insertTodo, markAll, clearCompleted } from '../intents';
 import { Component } from 'react';
@@ -12,7 +12,7 @@ export default class MainComponent extends Component {
   }
 
   componentWillMount() {
-    models.subscribe(state => {
+    todosModel.subscribe(state => {
       this.setState({todos: state});
     });
   }

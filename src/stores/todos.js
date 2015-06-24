@@ -1,5 +1,5 @@
 import { ReplaySubject } from 'rx';
-import { intent } from './intents';
+import { todoActions as intent } from '../actions/todoActions';
 import {
   INSERT_TODO,
   MARK_TODO,

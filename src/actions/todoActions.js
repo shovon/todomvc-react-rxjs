@@ -5,7 +5,7 @@ import {
   MARK_ALL,
   REMOVE_TODO,
   CLEAR_COMPLETED
-} from './constants';
+} from '../constants';
 
 export const intent = new ReplaySubject(1);
 

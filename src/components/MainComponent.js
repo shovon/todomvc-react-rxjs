@@ -1,6 +1,6 @@
-import { todos as todosModel } from '../models';
+import { todos as todosModel } from '../stores';
 import classnames from 'classnames';
-import { insertTodo, markAll, clearCompleted } from '../intents';
+import { insertTodo, markAll, clearCompleted } from '../actions/todoActions';
 import { Component } from 'react';
 import TodoItem from './TodoItem';
 import { Link } from 'react-router';

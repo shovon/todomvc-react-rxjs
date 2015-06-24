@@ -1,12 +1,12 @@
 import { ReplaySubject } from 'rx';
-import { todoActions as intent } from '../actions/todoActions';
+import { intent } from '../actions/todoActions';
 import {
   INSERT_TODO,
   MARK_TODO,
   MARK_ALL,
   REMOVE_TODO,
   CLEAR_COMPLETED
-} from './constants';
+} from '../constants';
 import { List, Map as ImmutableMap } from 'immutable';
 
 const model = new ReplaySubject(1);
@@ -22,7 +22,8 @@ const callbacks = {
       done: false
     });
     state = state.push(todo);
-    model.onNext(state);
+    return state;
+    // model.onNext(state);
   },
 
   [MARK_TODO]: payload => {
@@ -30,12 +31,14 @@ const callbacks = {
       .findIndex(todo => todo.get('id') === payload.todoId);
     const todo = state.get(todoIndex);
     state = state.set(todoIndex, todo.set('done', payload.isCompleted));
-    model.onNext(state);
+    return state;
+    // model.onNext(state);
   },
 
   [REMOVE_TODO]: payload => {
     state = state.filter(todo => todo.get('id') !== payload.todoId);
-    model.onNext(state);
+    return state;
+    // model.onNext(state);
   },
 
   [MARK_ALL]: () => {
@@ -44,17 +47,19 @@ const callbacks = {
     } else {
       state = state.map(todo => todo.set('done', true));
     }
-    model.onNext(state);
+    return state;
+    // model.onNext(state);
   },
 
   [CLEAR_COMPLETED]: () => {
     state = state.filter(todo => !todo.get('done'));
-    model.onNext(state);
+    return state;
+    // model.onNext(state);
   }
 };
 
 intent.subscribe(payload => {
-  callbacks[payload.type](payload);
+  model.onNext(callbacks[payload.type](payload));
 });
 
 model.onNext(state);

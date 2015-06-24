@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import { PropTypes } from 'react';
-import { markTodo, removeTodo } from '../intents';
+import { markTodo, removeTodo } from '../actions/todoActions';
 
 export default class TodoItem {
   static propTypes = {

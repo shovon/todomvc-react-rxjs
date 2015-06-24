@@ -20,7 +20,7 @@ const callbacks = {
     const latest = state.get(state.count() - 1);
     const todo = new ImmutableMap({
       id: typeof latest === 'undefined' ? 0 : latest.get('id') + 1,
-      text: payload.text,
+      text: payload.text.trim(),
       done: false
     });
     return state.push(todo);
@@ -52,17 +52,18 @@ const callbacks = {
     const todoIndex = state
       .findIndex(todo => todo.get('id') === payload.todoId);
     const todo = state.get(todoIndex);
-    return state.set(todoIndex, todo.set('text', payload.text));
+    return state.set(todoIndex, todo.set('text', payload.text.trim()));
   },
 
   [LOAD_TODOS]: () => {
-    return fromJS(JSON.parse(localStorage.getItem(localStorageKey)));
+    return fromJS(JSON.parse(localStorage.getItem(localStorageKey)) || []);
   }
 };
 
 // `reduce` used as a hack for maintaining state. Will do for now.
 intent.reduce((state, payload) => {
-  const result = callbacks[payload.type](state, payload);
+  const result = callbacks[payload.type](state, payload)
+    .filter(todo => !!todo.get('text'));
   if (payload.type !== LOAD_TODOS) {
     localStorage.setItem(localStorageKey, JSON.stringify(result.toJSON()));
   }

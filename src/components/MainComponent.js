@@ -1,6 +1,37 @@
-export default class MainComponent {
+import models from '../models';
+import classnames from 'classnames';
+import { insertTodo, markAll, clearCompleted } from '../intents';
+import { Component } from 'react';
+import TodoItem from './TodoItem';
+import { Link } from 'react-router';
+import { PropTypes } from 'react';
+
+export default class MainComponent extends Component {
+  static propTypes = {
+    path: PropTypes.string
+  }
+
+  componentWillMount() {
+    models.subscribe(state => {
+      this.setState({todos: state});
+    });
+  }
+
+  _filterTodosGivenPath() {
+    const { todos } = this.state;
+    const { path } = this.props;
+
+    switch (path) {
+    case '/active': return todos.filter(todo => !todo.get('done'));
+    case '/completed': return todos.filter(todo => todo.get('done'));
+    default: return todos;
+    }
+  }
+
   render() {
-    const { todos: state } = this.state;
+    const { todos } = this.state;
+    const filteredTodos = this._filterTodosGivenPath();
+    const activeClassName = 'selected';
 
     return (
       <div>
@@ -10,43 +41,49 @@ export default class MainComponent {
             <input
               className="new-todo"
               placeholder="What needs to be done ?"
-              onKeyDown={onKeyDown}
+              onKeyDown={::this._onKeyDown}
               autofocus />
           </header>
           <section
-            style={{display: state.count() > 0 ? 'block' : 'none'}}
+            style={{display: filteredTodos.count() > 0 ? 'block' : 'none'}}
             className='main'>
             <input
-              checked={state.every(todo => todo.get('done'))}
-              onChange={onMarkAllChange}
+              checked={filteredTodos.every(todo => todo.get('done'))}
+              onChange={::this._onMarkAllChange}
               className='toggle-all'
               type='checkbox' />
             <label htmlFor='toggle-all'>
               Mark all as complete
             </label>
             <ul className={classnames('todo-list')}>
-              {state.map(todo =>
+              {filteredTodos.map(todo =>
                 <TodoItem key={todo.get('id')} todo={todo} />
               )}
             </ul>
           </section>
           <footer
-            style={{display: state.count() > 0 ? 'block' : 'none'}}
+            style={{display: todos.count() > 0 ? 'block' : 'none'}}
             className='footer'>
             <span className="todo-count"></span>
             <ul className='filters'>
               <li>
-                <a href='#/' className='selected'>All</a>
+                <Link to='/' activeClassName={activeClassName}>
+                  All
+                </Link>
               </li>
               <li>
-                <a href='#/active'>Active</a>
+                <Link to='/active' activeClassName={activeClassName}>
+                  Active
+                </Link>
               </li>
               <li>
-                <a href='#/completed'>Completed</a>
+                <Link to='/completed' activeClassName={activeClassName}>
+                  Completed
+                </Link>
               </li>
             </ul>
             <button
-              onClick={onClearCompletedClick}
+              onClick={::this._onClearCompletedClick}
               className='clear-completed'>Clear Completed</button>
           </footer>
         </section>
@@ -66,18 +103,18 @@ export default class MainComponent {
     );
   }
 
-  onKeyDown(event) {
+  _onKeyDown(event) {
     if (event.keyCode === 13) {
       insertTodo(event.target.value);
       event.target.value = '';
     }
   }
 
-  onMarkAllChange() {
+  _onMarkAllChange() {
     markAll();
   }
 
-  onClearCompletedClick() {
+  _onClearCompletedClick() {
     clearCompleted();
   }
 }

@@ -1,5 +1,5 @@
 import { ReplaySubject } from 'rx';
-import { intent as todoActions } from '../actions/todoActions';
+import { todoActions }from '../actions';
 import {
   INSERT_TODO,
   MARK_TODO,
@@ -12,6 +12,7 @@ import {
 import { fromJS, List, Map as ImmutableMap } from 'immutable';
 
 const model = new ReplaySubject(1);
+export default model;
 
 const callbacks = {
   [INSERT_TODO]: (state, { todo }) => state.push(new ImmutableMap(todo)),
@@ -48,5 +49,3 @@ todoActions
   .subscribe(state => {
     model.onNext(state);
   });
-
-export default model;

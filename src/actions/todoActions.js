@@ -18,11 +18,12 @@ import {
   loadTodos as remoteLoadTodos
 } from '../remote';
 
-export const intent = new ReplaySubject(1);
+const actions = new ReplaySubject(1);
+export default actions;
 
 export function insertTodo(text) {
   remoteInsertTodo(text).then(todo => {
-    intent.onNext({
+    actions.onNext({
       todo,
       type: INSERT_TODO,
     });
@@ -31,7 +32,7 @@ export function insertTodo(text) {
 
 export function markTodo(todoId, isCompleted) {
   remoteMarkTodo(todoId, isCompleted).then(todo => {
-    intent.onNext({
+    actions.onNext({
       todo,
       type: MARK_TODO
     });
@@ -40,7 +41,7 @@ export function markTodo(todoId, isCompleted) {
 
 export function removeTodo(todoId) {
   remoteRemoveTodo(todoId).then(() => {
-    intent.onNext({
+    actions.onNext({
       todoId,
       type: REMOVE_TODO
     });
@@ -49,7 +50,7 @@ export function removeTodo(todoId) {
 
 export function markAll() {
   remoteMarkAll().then(todos => {
-    intent.onNext({
+    actions.onNext({
       todos,
       type: MARK_ALL,
     });
@@ -58,13 +59,13 @@ export function markAll() {
 
 export function clearCompleted() {
   remoteClearCompleted().then(todos => {
-    intent.onNext({ todos, type: CLEAR_COMPLETED });
+    actions.onNext({ todos, type: CLEAR_COMPLETED });
   });
 }
 
 export function editTodo(todoId, text) {
   remoteEditTodo(todoId, text).then(todo => {
-    intent.onNext({
+    actions.onNext({
       todo,
       type: EDIT_TODO
     });
@@ -73,7 +74,7 @@ export function editTodo(todoId, text) {
 
 export function loadTodos() {
   remoteLoadTodos().then(todos => {
-    intent.onNext({
+    actions.onNext({
       todos,
       type: LOAD_TODOS
     });

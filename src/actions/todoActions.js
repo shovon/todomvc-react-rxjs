@@ -8,52 +8,74 @@ import {
   EDIT_TODO,
   LOAD_TODOS
 } from '../constants';
+import {
+  insertTodo as remoteInsertTodo,
+  markTodo as remoteMarkTodo,
+  removeTodo as remoteRemoveTodo,
+  markAll as remoteMarkAll,
+  clearCompleted as remoteClearCompleted,
+  editTodo as remoteEditTodo,
+  loadTodos as remoteLoadTodos
+} from '../remote';
 
 export const intent = new ReplaySubject(1);
 
 export function insertTodo(text) {
-
-  intent.onNext({
-    type: INSERT_TODO,
-    text: text
+  remoteInsertTodo(text).then(todo => {
+    intent.onNext({
+      todo,
+      type: INSERT_TODO,
+    });
   });
 }
 
 export function markTodo(todoId, isCompleted) {
-  intent.onNext({
-    todoId,
-
-    type: MARK_TODO,
-    isCompleted: isCompleted
+  remoteMarkTodo(todoId, isCompleted).then(todo => {
+    intent.onNext({
+      todo,
+      type: MARK_TODO
+    });
   });
 }
 
 export function removeTodo(todoId) {
-  intent.onNext({
-    todoId,
-    type: REMOVE_TODO
+  remoteRemoveTodo(todoId).then(() => {
+    intent.onNext({
+      todoId,
+      type: REMOVE_TODO
+    });
   });
 }
 
 export function markAll() {
-  intent.onNext({ type: MARK_ALL });
+  remoteMarkAll().then(todos => {
+    intent.onNext({
+      todos,
+      type: MARK_ALL,
+    });
+  });
 }
 
 export function clearCompleted() {
-  intent.onNext({ type: CLEAR_COMPLETED });
+  remoteClearCompleted().then(todos => {
+    intent.onNext({ todos, type: CLEAR_COMPLETED });
+  });
 }
 
 export function editTodo(todoId, text) {
-  intent.onNext({
-    todoId,
-    text,
-
-    type: EDIT_TODO
+  remoteEditTodo(todoId, text).then(todo => {
+    intent.onNext({
+      todo,
+      type: EDIT_TODO
+    });
   });
 }
 
 export function loadTodos() {
-  intent.onNext({
-    type: LOAD_TODOS
+  remoteLoadTodos().then(todos => {
+    intent.onNext({
+      todos,
+      type: LOAD_TODOS
+    });
   });
 }

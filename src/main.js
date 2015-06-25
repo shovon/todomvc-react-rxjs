@@ -1,3 +1,5 @@
+import 'babel/polyfill';
+
 import 'todomvc-app-css/index.css';
 import 'todomvc-common/base.css';
 
